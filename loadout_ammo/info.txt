@@ -1,0 +1,11 @@
+ "AddonInfo"
+ {
+    "name"                "loadout_ammo"
+    "version"             "0.1"
+    "up_date"             "13/11/2020"
+    "author_name"         "Yogzie"
+    "author_email"        ""
+    "author_url"	  ""
+    "info"                ""
+    "override"            "1"
+ }
