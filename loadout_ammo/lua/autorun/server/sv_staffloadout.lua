@@ -6,6 +6,8 @@ util.AddNetworkString("YOGrequestSTAFFLOADOUT")
 util.AddNetworkString("YOGrequestSTAFFRANKS")
 util.AddNetworkString("YOGrequestINFAMMO")
 util.AddNetworkString("YOGrequestRAREAMMO")
+util.AddNetworkString("YOGRemove_Item")
+util.AddNetworkString("YOGAdd_Item")
 
 
 
@@ -14,6 +16,7 @@ local prefix = "[StaffLoadout]"
 local LDTloop = 0
 local Repetitions = 0
 print(prefix .. " Loading")
+--print("[TableEditor] For Help With Using The Active Table Editor Type !yoghelp")
 
 
 -- [[ The usergroups that can load the loadout / ammotype editor]] 
@@ -101,56 +104,6 @@ sendAll = function(ply)
 	net.Send(ply)
 end
 
---[[net.Receive("YOGrequestSTAFFLOADOUT", function(len, ply)
-	YOGsendSTAFFLOADOUT(ply)
-end)
-
-net.Receive("YOGrequestSTAFFRANKS", function(len, ply)
-	YOGsendSTAFFRANKS(ply)
-end)
-
-net.Receive("YOGrequestINFAMMO", function(len, ply)
-	YOGsendINFAMMO(ply)
-end)
-
-net.Receive("YOGrequestRAREAMMO", function(len, ply)
-	YOGsendRAREAMMO(ply)
-end)
-
-YOGsendSTAFFLOADOUT = function(ply)
-	net.Start("YOG_SENDSTAFFLOADOUT")
-	net.WriteTable(YOGSTAFFLOADOUT)
-	net.Send(ply)
-end
-
-YOGsendSTAFFRANKS = function(ply)
-	net.Start("YOG_SENDSTAFFRANKS")
-	net.WriteTable(YOGSTAFFRANKS)
-	net.Send(ply)
-end
-
-YOGsendINFAMMO = function(ply)
-	net.Start("YOG_SENDINFAMMO")
-	net.WriteTable(YOGINFAMMO)
-	net.Send(ply)
-end
-
-YOGsendRAREAMMO = function(ply)
-	net.Start("YOG_SENDRAREAMMO")
-	net.WriteTable(YOGRAREAMMO)
-	net.Send(ply)
-end]]
-
-
-
-
-
-
-
-
-
-
-
 
 YOGeditorCheck = function(ply)
 	for k in pairs(YOGEDITOR) do
@@ -169,3 +122,27 @@ hook.Add("PlayerSay", "YOGGUILoad", function(sender, text, teamChat)
 		end
 	end
 end)
+
+
+
+
+net.Receive("YOGRemove_Item", function(len, ply)
+	local yogTable = net.ReadInt(8)
+	local tableKey = net.ReadInt(8)
+	if yogTable == 1 then
+		table.remove(YOGSTAFFLOADOUT, tableKey)
+	elseif yogTable == 2 then
+		table.remove(YOGSTAFFLOADOUT, tableKey)			
+	elseif yogTable == 3 then
+		table.remove(YOGSTAFFLOADOUT, tableKey)
+	elseif yogTable == 4 then
+		table.remove(YOGSTAFFLOADOUT, tableKey)
+	end
+end)
+
+--[[local YOGREMOVEitem = function(key, tab)
+	net.Start("YOGRemove_Item")
+	net.WriteInt(tab, 8) -- Table 1-4 digit (Keyed at the top of the file)
+	net.WriteInt(key, 8) -- Table Key Value for Removal
+	net.SendToServer()
+end]]
