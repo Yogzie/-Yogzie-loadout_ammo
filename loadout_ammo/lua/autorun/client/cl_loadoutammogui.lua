@@ -5,8 +5,10 @@ local showRNK = false
 local showINF = false
 local showRAR = false
 local tableSelected = 0
+local yogRefresh = false
 --   1 = Loadout   2 = Ranks   3 = INFAmmo   4 = RAREAmmo
-local keySelected = 0
+local keyVSelected = 0
+local yogAddValue = ""
 
 blankTab = {}
 
@@ -31,12 +33,17 @@ local YOGREMOVEitem = function(key, tab)
 	net.SendToServer()
 end
 
-local YOGADDitem = function(tab)
+local YOGADDitem = function(tab, str)
 	net.Start("YOGAdd_Item")
 	net.WriteInt(tab, 8) -- Table 1-4 digit (Keyed at the top of the file)
+	net.WriteString(str)
 	net.SendToServer()
 end
 
+
+local refreshGUI = function()
+	yogtabgui(LocalPlayer(), true)
+end
 
 yogtabgui = function(ply, open)
 		if open then
@@ -80,6 +87,7 @@ yogtabgui = function(ply, open)
 				yogEntry:SetPos(boxw * 0.15, boxh * 0.8)
 				yogEntry:SetSize(boxw * 0.3, boxh * 0.07)
 				yogEntry:SetPlaceholderText("New Value Here")
+				
 
 
 				yogEntryLb = vgui.Create("DLabel", yogMenu)
@@ -110,13 +118,30 @@ yogtabgui = function(ply, open)
 				yogAddButton:SetText("Add Value")
 				yogAddButton:SetSize(boxw * 0.3, boxh * 0.12)
 				yogAddButton:SetPos(boxw * 0.65, boxh * 0.53)
+				yogAddButton.DoClick = function()
+					yogAddValue = yogEntry:GetValue() 
+
+					YOGADDitem(tableSelected, yogAddValue)
+					yogRefresh = true
+					if yogRefresh == true then
+						refreshGUI()
+						yogMenu:Remove()
+						print("[TableEditor] The GUI Has Refreshed To Account For The Changed Value!")
+					end
+				end
 
 				yogRemoveButton = vgui.Create("DButton", yogMenu)
 				yogRemoveButton:SetText("Remove Value")
 				yogRemoveButton:SetSize(boxw * 0.3, boxh * 0.12)
 				yogRemoveButton:SetPos(boxw * 0.65, boxh * 0.75)
-				yogRemoveButton.DoClick = function(ply)
-					YOGREMOVEitem(keyVSelected, tableSelected)
+				yogRemoveButton.DoClick = function()
+					YOGREMOVEitem( keyVSelected, tableSelected)
+					yogRefresh = true
+					if yogRefresh == true then
+						refreshGUI()
+						yogMenu:Remove()
+						print("[TableEditor] The GUI Has Refreshed To Account For The Changed Value!")
+					end
 				end
 
 
@@ -139,8 +164,8 @@ yogtabgui = function(ply, open)
 					local panelColor = Color(255,255,255,255)
 					if showLDT == true then
 						for k, v in pairs(tab) do
-							YOGKeyV = k
-							local yogshowLDT = vgui.Create("DButton", yogScroll)
+							local YOGKeyV = k
+							yogshowLDT = vgui.Create("DButton", yogScroll)
 							yogshowLDT:SetText(tab[k])
 							yogshowLDT:SetPos( panw * 0.09, ypos)
 							yogshowLDT:SetSize(panw * 0.8, panh * 0.15)
@@ -154,7 +179,8 @@ yogtabgui = function(ply, open)
 
 					if showRNK == true then
 						for k, v in pairs(tab) do
-							local yogshowRNK = vgui.Create("DButton", yogScroll)
+							local YOGKeyV = k
+							yogshowRNK = vgui.Create("DButton", yogScroll)
 							yogshowRNK:SetText(tab[k])
 							yogshowRNK:SetPos( panw * 0.09, ypos)
 							yogshowRNK:SetSize(panw * 0.8, panh * 0.15)
@@ -168,7 +194,8 @@ yogtabgui = function(ply, open)
 
 					if showINF == true then
 						for k, v in pairs(tab) do
-							local yogshowINF = vgui.Create("DButton", yogScroll)
+							local YOGKeyV = k
+							yogshowINF = vgui.Create("DButton", yogScroll)
 							yogshowINF:SetText( tab[k] )
 							yogshowINF:SetPos( panw * 0.09, ypos)
 							yogshowINF:SetSize(panw * 0.8, panh * 0.15)
@@ -182,7 +209,8 @@ yogtabgui = function(ply, open)
 
 					if showRAR == true then
 						for k, v in pairs(tab) do
-							local yogshowRAR = vgui.Create("DButton", yogScroll)
+							local YOGKeyV = k							
+							yogshowRAR = vgui.Create("DButton", yogScroll)
 							yogshowRAR:SetText( tab[k] )
 							yogshowRAR:SetPos( panw * 0.09, ypos )
 							yogshowRAR:SetSize( panw * 0.8, panh * 0.15)

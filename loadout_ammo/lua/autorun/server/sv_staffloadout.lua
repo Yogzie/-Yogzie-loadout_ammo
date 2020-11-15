@@ -1,4 +1,5 @@
 include("autorun/sh_loadoutammo.lua")
+
 util.AddNetworkString("YOG_opengui")
 util.AddNetworkString("YOG_reqalltabs")
 util.AddNetworkString("YOG_sendalltabs")
@@ -8,8 +9,6 @@ util.AddNetworkString("YOGrequestINFAMMO")
 util.AddNetworkString("YOGrequestRAREAMMO")
 util.AddNetworkString("YOGRemove_Item")
 util.AddNetworkString("YOGAdd_Item")
-
-
 
 
 local prefix = "[StaffLoadout]"
@@ -22,15 +21,24 @@ print(prefix .. " Loading")
 -- [[ The usergroups that can load the loadout / ammotype editor]] 
 YOGEDITOR = { "superadmin", "admin" } -- defaulted to superadmin and admin
 
+
+
+
 -- [[ Adjust the staff loadout as you see fit. It will not override default loadout set by DarkRP]]
-YOGSTAFFLOADOUT = { "weapon_physgun", "gmod_tool", "weaponchecker", "keys"  }
--- [[ Add the ulx ranks here ]]
-YOGSTAFFRANKS = { "superadmin", "admin", "mod", "tmod" }
+
+--YOGSTAFFLOADOUT = { "weapon_physgun", "gmod_tool", "weaponchecker", "keys"  } -- DEFAULT VALUES
+YOGSTAFFLOADOUTread = util.JSONToTable(file.Read("tabeditor/loadoutTable.txt", "DATA"))
+
+--YOGSTAFFRANKS = { "superadmin", "admin", "mod", "tmod" } -- DEFAULT VALUES
+YOGSTAFFRANKSread = util.JSONToTable(file.Read("tabeditor/rankTable.txt", "DATA"))
+
+--YOGINFAMMO = {"tfa_ammo_sniper_rounds", "tfa_ammo_ar2", "tfa_ammo_pistol", "buckshot"}  -- DEFAULT VALUES
+YOGINFAMMOread = util.JSONToTable(file.Read("tabeditor/commonammoTable.txt", "DATA")) -- place common ammotypes here
+
+--YOGRAREAMMO = { "ammo_rpgclip" } -- place rare ammotypes here(explosives etc) -- DEFAULT VALUES
+YOGRAREAMMOread = util.JSONToTable(file.Read("tabeditor/rareammoTable.txt", "DATA")) -- place rare ammotypes here(explosives etc)
 
 
-
-YOGINFAMMO = {"tfa_ammo_sniper_rounds", "tfa_ammo_ar2", "tfa_ammo_pistol", "buckshot" } -- place common ammotypes here
-YOGRAREAMMO = {"ammo_rpgclip"} -- place rare ammotypes here(explosives etc)
 
 
 
@@ -42,12 +50,12 @@ end
 
 -- Rank check for the command
 local YOGrankCheck = function(ply)
-	for Repetitions in pairs(YOGSTAFFRANKS) do
-		-- print(loadoutSize(YOGSTAFFRANKS) .. " " .. YOGSTAFFRANKS[Repetitions])	-- Debug
-		if ply:GetUserGroup() == YOGSTAFFRANKS[Repetitions] then 
+	for Repetitions in pairs(YOGSTAFFRANKSread) do
+		-- print(loadoutSize(YOGSTAFFRANKSread) .. " " .. YOGSTAFFRANKSread[Repetitions])	-- Debug
+		if ply:GetUserGroup() == YOGSTAFFRANKSread[Repetitions] then 
 			return true
 		end
-	-- print(prefix .. YOGSTAFFRANKS[v])	-- For debugging purposes
+	-- print(prefix .. YOGSTAFFRANKSread[v])	-- For debugging purposes
 	end
 end
 
@@ -57,11 +65,11 @@ end
 hook.Add("PlayerSay", "giveLoadout", function(sender, text, teamChat)
 	if text == "!staff" then
 		if YOGrankCheck(sender) == true then
-				while LDTloop != loadoutSize(YOGSTAFFLOADOUT) do
-					-- print(YOGSTAFFLOADOUT[LDTloop]) -- Debug
+				while LDTloop != loadoutSize(YOGSTAFFLOADOUTread) do
+					-- print(YOGSTAFFLOADOUTread[LDTloop]) -- Debug
 					LDTloop = LDTloop + 1
-					sender:Give(YOGSTAFFLOADOUT[LDTloop])
-					-- sender:ChatPrint(prefix .. YOGSTAFFLOADOUT[LDTloop] .. " Recieved")	-- Debug if needed						
+					sender:Give(YOGSTAFFLOADOUTread[LDTloop])
+					-- sender:ChatPrint(prefix .. YOGSTAFFLOADOUTread[LDTloop] .. " Recieved")	-- Debug if needed						
 				end
 			sender:ChatPrint(prefix .. " Staff Loadout Recieved!")
 			LDTloop = 0
@@ -70,8 +78,6 @@ hook.Add("PlayerSay", "giveLoadout", function(sender, text, teamChat)
 		end
 	end
 end)
-
-
 
 -- Table Editor Net Code From This Point Onward!
 
@@ -83,61 +89,133 @@ YOGappendTable = function()
 	
 end
 
-YOGremoveItem = function()
-
-end
-
 net.Receive("YOG_reqalltabs", function(len, ply)
 	sendAll(ply)
 end)
 
 sendAll = function(ply)
 	net.Start("YOG_sendalltabs")
-	net.WriteTable(YOGSTAFFLOADOUT)
 
-	net.WriteTable(YOGSTAFFRANKS)
+	net.WriteTable(YOGSTAFFLOADOUTread)
 
-	net.WriteTable(YOGINFAMMO)
+	net.WriteTable(YOGSTAFFRANKSread)
 
-	net.WriteTable(YOGRAREAMMO)
+	net.WriteTable(YOGINFAMMOread)
+
+	net.WriteTable(YOGRAREAMMOread)
 
 	net.Send(ply)
 end
-
 
 YOGeditorCheck = function(ply)
 	for k in pairs(YOGEDITOR) do
 		if ply:GetUserGroup() == YOGEDITOR[k] then
 			return true
+		else 
+			return false
 		end
 	end
 end
-
 
 hook.Add("PlayerSay", "YOGGUILoad", function(sender, text, teamChat)
 	if string.lower(text) == "!ld" then	
 		if YOGeditorCheck(sender) then
 			net.Start("YOG_opengui")
 			net.Send(sender)
+		else 
+			sender:ChatPrint("[TableEditor] You Are Not An Editor Rank!")
 		end
 	end
 end)
 
+yogldtr = function(key)
+	table.remove(YOGSTAFFLOADOUTread, key)
+	file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+end
 
+yogrnkr = function(key)
+	table.remove(YOGSTAFFRANKSread, key)
+	file.Write("tabeditor/rankTable.txt", util.TableToJSON(YOGSTAFFRANKSread))	
+end
 
+yoginfr = function(key)
+	table.remove(YOGINFAMMOread, key)
+	file.Write("tabeditor/commonammoTable.txt", util.TableToJSON(YOGINFAMMOread))	
+end
+
+yograrer = function(key)
+	table.remove(YOGRAREAMMOread, key)
+	file.Write("tabeditor/rareammoTable.txt", util.TableToJSON(YOGRAREAMMOread))
+end
 
 net.Receive("YOGRemove_Item", function(len, ply)
-	local yogTable = net.ReadInt(8)
-	local tableKey = net.ReadInt(8)
-	if yogTable == 1 then
-		table.remove(YOGSTAFFLOADOUT, tableKey)
-	elseif yogTable == 2 then
-		table.remove(YOGSTAFFLOADOUT, tableKey)			
-	elseif yogTable == 3 then
-		table.remove(YOGSTAFFLOADOUT, tableKey)
-	elseif yogTable == 4 then
-		table.remove(YOGSTAFFLOADOUT, tableKey)
+	local allowRemove = false
+	for k, v in pairs(YOGEDITOR) do	
+		if ply:GetUserGroup() == YOGEDITOR[k] then
+			allowRemove = true
+			local denyRemoveAccess = true
+		elseif denyRemoveAccess == true then
+			allowRemove = false
+			print("[TableEditor] A Non Editor Tried To Remove A Value From A Table! Name :" .. ply:Nick())
+		end
 	end
+
+	if allowRemove then
+		print("RemoveReceived")
+		local yogTable = net.ReadInt(8)
+		local tableKey = net.ReadInt(8)
+		local yogTabName = tostring(yogTable)		
+		if not file.Exists("tabeditor", "data") then 
+			file.CreateDir("tabeditor")
+		else
+			if yogTable == 1 then
+				yogldtr(tableKey)
+			elseif yogTable == 2 then
+				yogrnkr(tableKey)
+			elseif yogTable == 3 then	
+				yoginfr(tableKey)	
+			elseif yogTable == 4 then
+				yograrer(tableKey)
+			else
+				print("yogTable is not a good value")
+			end
+			print("Checked")
+		end
+	end
+
+end)
+
+
+net.Receive("YOGAdd_Item", function(len, ply)
+	local allowAdd = false
+	for k, v in pairs(YOGEDITOR) do	
+		if ply:GetUserGroup() == YOGEDITOR[k] then
+			allowAdd = true
+			local denyAddAccess = true
+		elseif denyAddAccess == true then
+			allowAdd = false
+			print("[TableEditor] A Non Editor Tried To Add A Value To A Table! Name :" .. ply:Nick())
+		end
+	end
+	if allowAdd == true then
+		local yogTable = net.ReadInt(8)
+		local AddedValue = net.ReadString()
+		if yogTable == 1 then
+			table.insert(YOGSTAFFLOADOUTread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
+			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+		elseif yogTable == 2 then
+			table.insert(YOGSTAFFRANKSread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
+			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+		elseif yogTable == 3 then
+			table.insert(YOGINFAMMOread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
+			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+		elseif yogTable == 4 then
+			table.insert(YOGRAREAMMOread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
+			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+		end
+
+	end
+
 end)
 
 --[[local YOGREMOVEitem = function(key, tab)
