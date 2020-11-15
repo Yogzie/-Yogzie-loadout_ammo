@@ -171,7 +171,6 @@ yogtabgui = function(ply, open)
 							yogshowLDT:SetSize(panw * 0.8, panh * 0.15)
 							yogshowLDT.DoClick = function()
 								keyVSelected = YOGKeyV
-								print("dsfjsaljfjhal")
 							end
 							ypos = ypos + yogshowLDT:GetTall() * 1.1
 						end
@@ -186,7 +185,6 @@ yogtabgui = function(ply, open)
 							yogshowRNK:SetSize(panw * 0.8, panh * 0.15)
 							yogshowRNK.DoClick = function()
 								keyVSelected = YOGKeyV
-								print("dsfjsaljfjhal")
 							end
 							ypos = ypos + yogshowRNK:GetTall() * 1.1
 						end
@@ -201,7 +199,6 @@ yogtabgui = function(ply, open)
 							yogshowINF:SetSize(panw * 0.8, panh * 0.15)
 							yogshowINF.DoClick = function(ply)
 								keyVSelected = YOGKeyV
-								print("dsfjsaljfjhal")
 							end
 							ypos = ypos + yogshowINF:GetTall() * 1.1
 						end
@@ -215,8 +212,7 @@ yogtabgui = function(ply, open)
 							yogshowRAR:SetPos( panw * 0.09, ypos )
 							yogshowRAR:SetSize( panw * 0.8, panh * 0.15)
 							yogshowRAR.DoClick = function(ply)
-								panelColor = Color(66,66,66,200)
-								DisplayTable()
+								keyVSelected = YOGKeyV
 							end
 							ypos = ypos + yogshowRAR:GetTall() * 1.1
 						end			

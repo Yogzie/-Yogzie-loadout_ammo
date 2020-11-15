@@ -27,16 +27,16 @@ YOGEDITOR = { "superadmin", "admin" } -- defaulted to superadmin and admin
 -- [[ Adjust the staff loadout as you see fit. It will not override default loadout set by DarkRP]]
 
 --YOGSTAFFLOADOUT = { "weapon_physgun", "gmod_tool", "weaponchecker", "keys"  } -- DEFAULT VALUES
-YOGSTAFFLOADOUTread = util.JSONToTable(file.Read("tabeditor/loadoutTable.txt", "DATA"))
+YOGSTAFFLOADOUTread = util.JSONToTable(file.Read("tableditor/loadoutTable.txt", "DATA"))
 
 --YOGSTAFFRANKS = { "superadmin", "admin", "mod", "tmod" } -- DEFAULT VALUES
-YOGSTAFFRANKSread = util.JSONToTable(file.Read("tabeditor/rankTable.txt", "DATA"))
+YOGSTAFFRANKSread = util.JSONToTable(file.Read("tableditor/rankTable.txt", "DATA"))
 
 --YOGINFAMMO = {"tfa_ammo_sniper_rounds", "tfa_ammo_ar2", "tfa_ammo_pistol", "buckshot"}  -- DEFAULT VALUES
-YOGINFAMMOread = util.JSONToTable(file.Read("tabeditor/commonammoTable.txt", "DATA")) -- place common ammotypes here
+YOGINFAMMOread = util.JSONToTable(file.Read("tableditor/commonammoTable.txt", "DATA")) -- place common ammotypes here
 
 --YOGRAREAMMO = { "ammo_rpgclip" } -- place rare ammotypes here(explosives etc) -- DEFAULT VALUES
-YOGRAREAMMOread = util.JSONToTable(file.Read("tabeditor/rareammoTable.txt", "DATA")) -- place rare ammotypes here(explosives etc)
+YOGRAREAMMOread = util.JSONToTable(file.Read("tableditor/rareammoTable.txt", "DATA")) -- place rare ammotypes here(explosives etc)
 
 
 
@@ -130,22 +130,22 @@ end)
 
 yogldtr = function(key)
 	table.remove(YOGSTAFFLOADOUTread, key)
-	file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+	file.Write("tableditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
 end
 
 yogrnkr = function(key)
 	table.remove(YOGSTAFFRANKSread, key)
-	file.Write("tabeditor/rankTable.txt", util.TableToJSON(YOGSTAFFRANKSread))	
+	file.Write("tableditor/rankTable.txt", util.TableToJSON(YOGSTAFFRANKSread))	
 end
 
 yoginfr = function(key)
 	table.remove(YOGINFAMMOread, key)
-	file.Write("tabeditor/commonammoTable.txt", util.TableToJSON(YOGINFAMMOread))	
+	file.Write("tableditor/commonammoTable.txt", util.TableToJSON(YOGINFAMMOread))	
 end
 
 yograrer = function(key)
 	table.remove(YOGRAREAMMOread, key)
-	file.Write("tabeditor/rareammoTable.txt", util.TableToJSON(YOGRAREAMMOread))
+	file.Write("tableditor/rareammoTable.txt", util.TableToJSON(YOGRAREAMMOread))
 end
 
 net.Receive("YOGRemove_Item", function(len, ply)
@@ -165,8 +165,8 @@ net.Receive("YOGRemove_Item", function(len, ply)
 		local yogTable = net.ReadInt(8)
 		local tableKey = net.ReadInt(8)
 		local yogTabName = tostring(yogTable)		
-		if not file.Exists("tabeditor", "data") then 
-			file.CreateDir("tabeditor")
+		if not file.Exists("tableditor", "data") then 
+			file.CreateDir("tableditor")
 		else
 			if yogTable == 1 then
 				yogldtr(tableKey)
@@ -202,16 +202,16 @@ net.Receive("YOGAdd_Item", function(len, ply)
 		local AddedValue = net.ReadString()
 		if yogTable == 1 then
 			table.insert(YOGSTAFFLOADOUTread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
-			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+			file.Write("tableditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
 		elseif yogTable == 2 then
-			table.insert(YOGSTAFFRANKSread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
-			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+			table.insert(YOGSTAFFRANKSread, table.Count(YOGSTAFFRANKSread) + 1, AddedValue )
+			file.Write("tableditor/rankTable.txt", util.TableToJSON(YOGSTAFFRANKSread))
 		elseif yogTable == 3 then
-			table.insert(YOGINFAMMOread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
-			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+			table.insert(YOGINFAMMOread, table.Count(YOGINFAMMOread) + 1, AddedValue )
+			file.Write("tableditor/commonammoTable.txt", util.TableToJSON(YOGINFAMMOread))
 		elseif yogTable == 4 then
-			table.insert(YOGRAREAMMOread, table.Count(YOGSTAFFLOADOUTread) + 1, AddedValue )
-			file.Write("tabeditor/loadoutTable.txt", util.TableToJSON(YOGSTAFFLOADOUTread))
+			table.insert(YOGRAREAMMOread, table.Count(YOGRAREAMMOread) + 1, AddedValue )
+			file.Write("tableditor/rareammoTable.txt", util.TableToJSON(YOGRAREAMMOread))
 		end
 
 	end

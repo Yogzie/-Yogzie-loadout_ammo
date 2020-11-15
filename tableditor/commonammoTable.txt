@@ -1,0 +1,1 @@
+["tfa_ammo_sniper_rounds","tfa_ammo_ar2","tfa_ammo_pistol"]
